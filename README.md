@@ -61,8 +61,8 @@ We will divide responsibilities across each of the major parts of the project to
 #### Modeling choices
 
 - Guests, hosts and billing parties: The text treats these as overlapping roles, so we used one table called guestType.
-- Sleeping and meeting rooms: Rooms can serve both purposes, so we used a single Room table instead of subtypes. can_sleep and can_meet flags show the uses, with separate sleeping and seating capacities.
-- Adjacency: Rooms can have many neighbors, so Room_Adjacency handles the many-to-many relationship. The rules about how many sleeping and meeting rooms can be adjacent are business rules that an ERD can't show, so they're left to the application.
-- A room can have two bed types, so Room_Bed uses a composite key of room and bed size, and Bed_Size is a lookup table.
+- Sleeping and meeting rooms: Rooms can serve both purposes, so we used a single Room table instead of subtypes. canSleep and canMeet flags show the uses, with separate sleeping and seating capacities.
+- Adjacency: Rooms can have many neighbors, so room_adjacency handles the many-to-many relationship. The rules about how many sleeping and meeting rooms can be adjacent are business rules that an ERD can't show, so they're left to the application.
+- A room can have two bed types, so room_bed uses a composite key of room and bed size, and bed_size is a lookup table.
 - Each bill has one responsible party, billed via one invoice. But one invoice could be paid through many payments.
 - Bed size, guest count, smoking is determined by the room, and a party who wishes to reserve rooms with these qualities will be booked rooms that have such qualities without each room's qualities having to change.
