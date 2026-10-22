@@ -36,19 +36,24 @@ We will divide responsibilities across each of the major parts of the project to
 - Guests, hosts, billing parties and organizations are all stored as one party (with a role/type) instead of separate tables. The role a party plays in a reservation is recorded in reservation_party.guestTypeId.
 - The billing party can differ from the guest. invoice.billingPartyId points to party, not to the guest, which supports an outside host or organization paying.
 - Split billing: one reservation can produce several invoices with different billing parties (e.g. room billed to one party, phone calls billed to the occupant). Each service_usage row records which party used the service, and each invoice line points to the usage it charges.
-- When an organization is the billing party, a named individual acts on its behalf. We assume this contact person is a party record linked to the organization, owned by the Rooms & Events module.
+- When an organization is the billing party, a named individual acts on its behalf. We assume this individual is recorded as a separate party, and the link between the individual and the organization is handled by the application and is not modeled.
 - Room charges and surcharges appear as invoice lines with a null usageId. Services such as meals, phone calls and spa visits link to service_usage.
 - Totals, balances and amounts due are derived by queries and are not stored. This avoids transitive dependencies and keeps the tables in 3NF.
 - Prices live in allied_service.unitPrice. Pricing rules for meeting rooms (half rate for non-eating slots, one free slot per paid eating slot, waived fees) are computed by the application, not modeled.
 - Advance deposits are an optional amount on the reservation and are handled by Rooms & Events. If a deposit has to appear on the bill, it is applied as an invoice line.
+- reservation.partyId is the party that made the request, while reservation_party lists every party that stays or pays under that reservation.
+- A reservation stores the requested bed size, smoking preference and number of guests. Actual rooms are chosen later through room_assignment.
+- An event is hosted by a party (event.hostPartyId), and a reservation may optionally be linked to an event (reservation.eventId).
+- A room's availability (renovation, not made up and cleaned) is tracked through room_status.
 
 #### Access cards and messages
 
 - A card belongs to exactly one holder, either a staff member or a guest party, never both. card.staffId and card.partyId are each nullable, and exactly one is filled in.
-- Each reader belongs to a room. We assume restaurants and the health club are modeled as room entries (as the case treats outdoor courtyards as meeting rooms), so readers need no separate facility table.
+- Each reader is installed either in a room or in a facility (restaurant, health club, etc.), so card_reader.roomId and card_reader.facilityId are each nullable and exactly one is filled in.
 - The two reader slots (entering/leaving) are stored as accessLog.accessGranted plus the timestamp. We do not model a separate direction field.
 - Messages attach to the reservation, not an individual guest, because the hotel contacts the reserving party. The "keep my whereabouts confidential" flag is a party-level attribute in Rooms & Events.
 - Card readers are not tied to specific cards. They accept any cards granted permission.
+- Staff approve stay extensions (stay_extension.approvedByStaffId), send guest messages and hold access cards, so one staff table serves all three.
 
 ### Tradeoffs or limitations
 
